@@ -1,0 +1,78 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5-create-schedule
+      author: max
+      changes:
+        - createTable:
+            tableName: schedules
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: external_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: created_date
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_modified_date
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: version
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: bigint
+              - column:
+                  name: teacher_id
+                  type: bigint
+              - column:
+                  name: course_id
+                  type: bigint
+              - column:
+                  name: start_time
+                  type: timestamp
+
+        - addForeignKeyConstraint:
+            baseTableName: schedules
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_schedule_group
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: schedules
+            baseColumnNames: teacher_id
+            referencedTableName: teachers
+            referencedColumnNames: id
+            constraintName: fk_schedule_teacher
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: schedules
+            baseColumnNames: course_id
+            referencedTableName: courses
+            referencedColumnNames: id
+            constraintName: fk_schedule_course
+            onDelete: CASCADE
