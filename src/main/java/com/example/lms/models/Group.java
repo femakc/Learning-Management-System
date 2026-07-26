@@ -18,11 +18,10 @@ import java.util.Set;
 @NoArgsConstructor
 @SQLRestriction("deleted = false")
 public class Group extends BaseEntity {
-
+    @Column(name = "name",nullable = false, unique = true, length = 255)
     private String name;
 
     @ManyToMany(mappedBy = "groups")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<Student> students = new HashSet<>();
 
 }

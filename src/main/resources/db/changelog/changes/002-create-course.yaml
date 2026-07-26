@@ -51,3 +51,8 @@ databaseChangeLog:
                   type: varchar(1000)
                   constraints:
                     nullable: true
+              - column:
+                  name: teacher_id
+                  type: bigint
+                  constraints:
+                    nullable: false

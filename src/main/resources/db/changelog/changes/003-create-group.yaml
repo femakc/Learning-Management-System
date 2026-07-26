@@ -40,13 +40,6 @@ databaseChangeLog:
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
-#              - column:
-#                  name: id
-#                  type: bigint
-#                  autoIncrement: true
-#                  constraints:
-#                    primaryKey: true
-#                    nullable: false
               - column:
                   name: name
                   type: varchar(255)

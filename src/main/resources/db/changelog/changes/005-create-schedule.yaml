@@ -44,14 +44,14 @@ databaseChangeLog:
                   name: group_id
                   type: bigint
               - column:
-                  name: teacher_id
-                  type: bigint
-              - column:
                   name: course_id
                   type: bigint
               - column:
                   name: start_time
-                  type: timestamp
+                  type: timestamp with time zone
+              - column:
+                  name: end_time
+                  type: timestamp with time zone
 
         - addForeignKeyConstraint:
             baseTableName: schedules
@@ -59,14 +59,6 @@ databaseChangeLog:
             referencedTableName: groups
             referencedColumnNames: id
             constraintName: fk_schedule_group
-            onDelete: CASCADE
-
-        - addForeignKeyConstraint:
-            baseTableName: schedules
-            baseColumnNames: teacher_id
-            referencedTableName: teachers
-            referencedColumnNames: id
-            constraintName: fk_schedule_teacher
             onDelete: CASCADE
 
         - addForeignKeyConstraint:

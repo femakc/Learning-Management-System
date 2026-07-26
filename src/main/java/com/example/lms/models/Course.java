@@ -1,6 +1,7 @@
 package com.example.lms.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,4 +20,8 @@ public class Course extends BaseEntity {
 
     @Column(name = "description", length = 1000)
     private String description;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "teacher_id", nullable = false)
+    private Teacher teacher;
 }
