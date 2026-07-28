@@ -8,8 +8,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {TeacherMapper.class})
 public interface CourseMapper {
-    //    Course courseResponseDtoToCourse(CourseResponseDto courseDto);
-    //    CourseRequestDto courseToCourseRequestDto(Course course);
 
     @Mapping(source = "externalId", target = "id")
     CourseResponseDto toResponseDto(Course course);
@@ -20,6 +18,6 @@ public interface CourseMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "teacherId", ignore = true)
+    @Mapping(target = "teacher", ignore = true)
     Course toEntity(CourseRequestDto courseDto);
 }

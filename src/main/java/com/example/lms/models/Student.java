@@ -2,6 +2,7 @@ package com.example.lms.models;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,7 @@ import java.util.Set;
 @Setter
 @Table(name = "students")
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @SQLRestriction("deleted = false")
 public class Student extends BaseEntity{
 
@@ -27,7 +29,6 @@ public class Student extends BaseEntity{
     private String lastName;
 
     @ManyToMany
-    @Column(nullable = false)
     @JoinTable(
             name = "student_group",
             joinColumns = @JoinColumn(name = "student_id"),

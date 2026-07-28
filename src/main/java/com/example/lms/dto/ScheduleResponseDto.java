@@ -6,7 +6,8 @@ import java.util.UUID;
 
 public record ScheduleResponseDto (
         UUID id,
-        GroupResponseDto group,
+//        GroupResponseDto group,
+        GroupCompactDto group,
         CourseResponseDto course,
         LocalDateTime startTime,
         LocalDateTime endTime
