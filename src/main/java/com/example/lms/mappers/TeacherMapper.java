@@ -21,7 +21,6 @@ public interface TeacherMapper {
     @Mapping(target = "deleted", ignore = true)
     Teacher toEntity(TeacherRequestDto teacherRequestDto);
 
-    //TODO Обновление существующей сущности из DTO (Для PUT/PATCH запросов) возможно не понадобиться
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "externalId", ignore = true)
     @Mapping(target = "createdDate", ignore = true)

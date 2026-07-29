@@ -5,6 +5,8 @@ import com.example.lms.dto.TeacherResponseDto;
 import com.example.lms.service.TeacherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +28,20 @@ public class TeacherController {
     }
 
     @GetMapping
-    //TODO настроить пагинацию
-    public ResponseEntity<List<TeacherResponseDto>> getAllTeachers() {
-        List<TeacherResponseDto> response = teacherService.findAllTeachers();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<PagedModel<TeacherResponseDto>> getAllTeachers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "lastName") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir
+    ) {
+        Page<TeacherResponseDto> teachersPage = teacherService.findAllTeachersWithPagination(
+                page,
+                size,
+                sortBy,
+                sortDir
+        );
+        PagedModel<TeacherResponseDto> response = new PagedModel<>(teachersPage);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{externalId}")
@@ -52,5 +64,4 @@ public class TeacherController {
         TeacherResponseDto response = teacherService.updateTeacherByExternalId(externalId, teacherRequestDto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-    //TODO сделать ручку обновления преподавателя
 }

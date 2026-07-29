@@ -7,6 +7,7 @@ import com.example.lms.models.Group;
 import com.example.lms.models.Student;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.Collections;
 import java.util.Set;
@@ -33,4 +34,10 @@ public interface StudentMapper {
                 .map(group -> new GroupCompactDto(group.getExternalId(), group.getName()))
                 .collect(Collectors.toSet());}
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "externalId", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    void updateEntityFromDto(StudentRequestDto studentRequestDto, @MappingTarget Student student);
 }

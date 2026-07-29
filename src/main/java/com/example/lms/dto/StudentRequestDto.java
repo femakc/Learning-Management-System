@@ -1,6 +1,7 @@
 package com.example.lms.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -16,6 +17,6 @@ public record StudentRequestDto (
         @Size(min = 2, max = 255, message = "Фамилия студента может быть от 2 до 255 символов")
         String lastName,
 
-        @NotNull(message = "у студента должна быть хотя бы одна группа")
+        @NotEmpty(message = "у студента должна быть хотя бы одна группа")
         Set<UUID> groupIds
 ){}

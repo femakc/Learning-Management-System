@@ -1,0 +1,98 @@
+package com.example.lms.service;
+
+import com.example.lms.dao.GroupRepository;
+import com.example.lms.dao.StudentRepository;
+import com.example.lms.dto.StudentRequestDto;
+import com.example.lms.dto.StudentResponseDto;
+import com.example.lms.exceptions.ResourceNotFoundException;
+import com.example.lms.mappers.StudentMapper;
+import com.example.lms.models.Group;
+import com.example.lms.models.Student;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Primary
+public class StudentServiceImpl implements StudentService {
+    private final StudentRepository studentRepository;
+    private final GroupRepository groupRepository;
+    private final StudentMapper studentMapper;
+
+    @Override
+    @Transactional
+    public StudentResponseDto saveStudent(StudentRequestDto studentRequestDto) {
+        Student student = studentMapper.toEntity(studentRequestDto);
+        Set<Group> findGroups = groupRepository.findAllByExternalIdIn(studentRequestDto.groupIds());
+
+        if (findGroups.size() != studentRequestDto.groupIds().size()) {
+            throw new ResourceNotFoundException("Одна или несколько указанных групп не найдены");
+        }
+        student.setGroups(findGroups);
+        Student savedStudent = studentRepository.save(student);
+        return studentMapper.toResponseDto(savedStudent);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public StudentResponseDto findStudentByExternalId(UUID externalId) {
+        Student student = studentRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                                "Студент с ID " + externalId + " не найден"
+                        ))
+                ;
+        return studentMapper.toResponseDto(student);
+    }
+
+    @Override
+    @Transactional
+    public StudentResponseDto updateStudentByExternalId(
+            UUID externalId,
+            StudentRequestDto studentRequestDto) {
+        Student student = studentRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Студент с ID " + externalId + " не найден"
+                ))
+                ;
+        studentMapper.updateEntityFromDto(studentRequestDto, student);
+        return studentMapper.toResponseDto(student);
+    }
+
+    @Override
+    @Transactional
+    public void deleteStudentByExternalId(UUID externalId) {
+        Student student = studentRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Студент с ID " + externalId + " не найден"
+                ))
+                ;
+        student.setDeleted(true);
+        studentRepository.save(student);
+    }
+
+    @Override
+    @Transactional
+    public Page<StudentResponseDto> findAllStudentWithPagination(
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.DESC.name())
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Student> studentPage = studentRepository.findAll(pageable);
+        return studentPage.map(studentMapper::toResponseDto);
+    }
+}
