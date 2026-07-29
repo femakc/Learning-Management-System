@@ -64,6 +64,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<GroupResponseDto> findAllGroupsWithPagination(
             int page,
             int size,

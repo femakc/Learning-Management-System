@@ -55,7 +55,7 @@ public class StudentController {
             @RequestParam UUID externalId,
             @RequestBody StudentRequestDto studentRequestDto) {
         StudentResponseDto response = studentService.updateStudentByExternalId(externalId, studentRequestDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/delete-student/{externalId}")

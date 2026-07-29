@@ -45,7 +45,7 @@ public class TeacherController {
 
     @GetMapping("/{externalId}")
     public ResponseEntity<TeacherResponseDto>
-    getTeacher(@PathVariable UUID externalId) {
+    getTeacherByExternalId(@PathVariable UUID externalId) {
         TeacherResponseDto response = teacherService.getTeacherByExternalId(externalId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -61,6 +61,6 @@ public class TeacherController {
             @PathVariable UUID externalId,
             @RequestBody TeacherRequestDto teacherRequestDto) {
         TeacherResponseDto response = teacherService.updateTeacherByExternalId(externalId, teacherRequestDto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 }
