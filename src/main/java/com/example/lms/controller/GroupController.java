@@ -1,7 +1,6 @@
 package com.example.lms.controller;
 
 import com.example.lms.dto.GroupResponseDto;
-import com.example.lms.mappers.GroupMapper;
 import com.example.lms.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

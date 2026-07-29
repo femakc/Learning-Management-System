@@ -2,7 +2,6 @@ package com.example.lms.controller;
 
 import com.example.lms.dto.StudentRequestDto;
 import com.example.lms.dto.StudentResponseDto;
-import com.example.lms.models.Student;
 import com.example.lms.service.StudentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

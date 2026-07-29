@@ -3,7 +3,6 @@ package com.example.lms.mappers;
 import com.example.lms.dto.GroupCompactDto;
 import com.example.lms.dto.GroupRequestDto;
 import com.example.lms.dto.GroupResponseDto;
-import com.example.lms.dto.TeacherRequestDto;
 import com.example.lms.models.Group;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
