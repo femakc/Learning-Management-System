@@ -18,9 +18,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
+    //TODO добавлять группу на кур
 
     @GetMapping
-    public ResponseEntity<PagedModel<GroupResponseDto>> findAllGroupsWithPagination(
+    public ResponseEntity<PagedModel<GroupResponseDto>> getAllGroupsWithPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
@@ -36,7 +37,7 @@ public class GroupController {
     }
 
     @GetMapping("/{externalId}")
-    public ResponseEntity<GroupResponseDto> findGroupByExternalId (@RequestParam UUID externalId) {
+    public ResponseEntity<GroupResponseDto> getGroupByExternalId (@PathVariable UUID externalId) {
         GroupResponseDto response = groupService.findGroupByExternalId(externalId);
         return ResponseEntity.ok(response);
     }
@@ -56,6 +57,11 @@ public class GroupController {
         groupService.deleteGroupByExternalId(externalId);
     }
 
+    @DeleteMapping("/{groupId}/course/{courseId}")
+    void deleteGroupCourse(@PathVariable UUID groupId, @PathVariable UUID courseId){
+        groupService.removeCourseFromGroupByExternalId(groupId, courseId);
+    }
+
     @PostMapping
     public ResponseEntity<GroupResponseDto> createGroup (
             @Valid
@@ -63,5 +69,13 @@ public class GroupController {
     ){
         GroupResponseDto savedGroup = groupService.saveGroup(groupRequestDto);
         return ResponseEntity.ok(savedGroup);
+    }
+
+    @PatchMapping("/recovery-group/{externalId}")
+    public ResponseEntity<GroupResponseDto> recoveryGroup (
+            @PathVariable UUID externalId
+    ) {
+        GroupResponseDto response = groupService.restoreGroupByExternalId(externalId);
+        return ResponseEntity.ok(response);
     }
 }

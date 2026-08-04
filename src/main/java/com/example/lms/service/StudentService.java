@@ -11,6 +11,8 @@ public interface StudentService {
     StudentResponseDto findStudentByExternalId(UUID externalId);
     StudentResponseDto updateStudentByExternalId(UUID externalId, StudentRequestDto studentRequestDto);
     void deleteStudentByExternalId(UUID externalId);
+    StudentResponseDto unitedStudentOfGroup(UUID externalIdStudent, UUID externalIdGroup);
+    StudentResponseDto removeStudentOfGroup(UUID externalIdStudent, UUID externalIdGroup);
 
     Page<StudentResponseDto> findAllStudentWithPagination(int page, int size, String sortBy, String sortDir);
 }

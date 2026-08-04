@@ -1,5 +1,6 @@
 package com.example.lms.controller;
 
+import com.example.lms.dto.GroupRequestDto;
 import com.example.lms.dto.StudentRequestDto;
 import com.example.lms.dto.StudentResponseDto;
 import com.example.lms.service.StudentService;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class StudentController {
     private final StudentService studentService;
+    //TODO написать добавление студента в группу
 
     @GetMapping
     public ResponseEntity<PagedModel<StudentResponseDto>> getAllStudent(
@@ -63,4 +65,21 @@ public class StudentController {
         studentService.deleteStudentByExternalId(externalId);
     }
 
+    @PostMapping("/{studentId}/group/{groupId}")
+    public ResponseEntity<StudentResponseDto> addGroupStudent(
+           @PathVariable UUID studentId,
+           @PathVariable UUID groupId
+    ) {
+        StudentResponseDto response = studentService.unitedStudentOfGroup(studentId, groupId);
+        return ResponseEntity.ok(response); //TODO проверить работу
+    }
+
+    @DeleteMapping("/{studentId}/group/{groupId}")
+    public ResponseEntity<StudentResponseDto> removeGroupStudent(
+            @PathVariable UUID studentId,
+            @PathVariable UUID groupId
+    ) {
+        StudentResponseDto response = studentService.removeStudentOfGroup(studentId, groupId);
+        return ResponseEntity.ok(response);
+    }
 }

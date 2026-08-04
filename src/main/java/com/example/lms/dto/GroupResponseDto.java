@@ -9,5 +9,6 @@ public record GroupResponseDto (
         UUID id,
         String name,
         Set<StudentResponseDto> students,
+        Set<CourseCompactDto> courses,
         LocalDateTime createdDate
 ){}

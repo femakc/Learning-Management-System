@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: 7-create-group-course
+      author: max
+      changes:
+        - createTable:
+            tableName: group_course
+            columns:
+              - column:
+                  name: group_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: course_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: group_course
+            columnNames: group_id, course_id
+            constraintName: pk_group_course_group
+
+        - addForeignKeyConstraint:
+            baseTableName: group_course
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_group_course
+            onDelete: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: group_course
+            baseColumnNames: course_id
+            referencedTableName: courses
+            referencedColumnNames: id
+            constraintName: fk_group_course_course
+            onDelete: CASCADE

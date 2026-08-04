@@ -95,4 +95,41 @@ public class StudentServiceImpl implements StudentService {
         Page<Student> studentPage = studentRepository.findAll(pageable);
         return studentPage.map(studentMapper::toResponseDto);
     }
+
+    @Override
+    @Transactional
+    public StudentResponseDto unitedStudentOfGroup(UUID externalIdStudent, UUID externalIdGroup) {
+        Student student = studentRepository.findByExternalId(externalIdStudent)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Студента с ID " + externalIdStudent + " не существует"
+                ));
+        Group group = groupRepository.findAnyByExternalId(externalIdGroup)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Группы с ID " + externalIdGroup + " не существует"
+                ));
+        student.getGroups().add(group);
+        studentRepository.save(student); //TODO возможно save излишний
+        return studentMapper.toResponseDto(student);
+    }
+
+    @Override
+    @Transactional
+    public StudentResponseDto removeStudentOfGroup(UUID externalIdStudent, UUID externalIdGroup) {
+        Student student = studentRepository.findByExternalId(externalIdStudent)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Студента с ID " + externalIdStudent + " не существует"
+                ));
+        Group group = groupRepository.findAnyByExternalId(externalIdGroup)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Группы с ID " + externalIdGroup + " не существует"
+                ));
+
+        if (!student.getGroups().contains(group)) {
+            throw new ResourceNotFoundException("Студент не состоит в указанной группе");
+        }
+
+        student.getGroups().remove(group);
+        studentRepository.save(student);
+        return studentMapper.toResponseDto(student);
+    }
 }

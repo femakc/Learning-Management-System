@@ -24,4 +24,11 @@ public class Group extends BaseEntity {
     @ManyToMany(mappedBy = "groups")
     private Set<Student> students = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "group_course",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id")
+    )
+    private Set<Course> courses = new HashSet<>();
 }

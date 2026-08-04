@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.Set;
 import java.util.UUID;
 
 public record CourseRequestDto (
@@ -15,5 +16,7 @@ public record CourseRequestDto (
         String description,
 
         @NotNull(message = "У курса должен быть назначен один учитель")
-        UUID teacherId
+        UUID teacherId,
+
+        Set<UUID> groups
 ){}

@@ -11,5 +11,6 @@ public record GroupRequestDto (
         @Size(max = 255, message = "Название группы не длиннее 255 символов")
         String name,
 
-        Set<UUID> studentIds
+        Set<UUID> studentIds,
+        Set<UUID> courseIds
 ){}
