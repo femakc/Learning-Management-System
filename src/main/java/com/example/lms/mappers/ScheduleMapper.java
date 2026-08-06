@@ -20,7 +20,7 @@ public interface ScheduleMapper {
     @Mapping(target = "lastModifiedDate", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "group", ignore = true)  // Игнорируем, свяжем по UUID вручную в Service
+    @Mapping(target = "group", ignore = true)
     @Mapping(target = "course", ignore = true)
     Schedule toEntity(ScheduleRequestDto scheduleRequestDto);
 
@@ -29,7 +29,7 @@ public interface ScheduleMapper {
     @Mapping(target = "createdDate", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "group", ignore = true)  // Игнорируем, связи обновляются в сервисе вручную
-    @Mapping(target = "course", ignore = true) // Игнорируем, связи обновляются в сервисе вручную
+    @Mapping(target = "group", ignore = true)
+    @Mapping(target = "course", ignore = true)
     void updateEntityFromDto(ScheduleRequestDto requestDto, @MappingTarget Schedule schedule);
 }

@@ -18,7 +18,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class GroupController {
     private final GroupService groupService;
-    //TODO добавлять группу на кур
 
     @GetMapping
     public ResponseEntity<PagedModel<GroupResponseDto>> getAllGroupsWithPagination(
@@ -53,12 +52,12 @@ public class GroupController {
     }
 
     @DeleteMapping("/delete-group/{externalId}")
-    void deleteGroup(@PathVariable UUID externalId){
+    public void deleteGroup(@PathVariable UUID externalId){
         groupService.deleteGroupByExternalId(externalId);
     }
 
     @DeleteMapping("/{groupId}/course/{courseId}")
-    void deleteGroupCourse(@PathVariable UUID groupId, @PathVariable UUID courseId){
+    public void deleteGroupCourse(@PathVariable UUID groupId, @PathVariable UUID courseId){
         groupService.removeCourseFromGroupByExternalId(groupId, courseId);
     }
 

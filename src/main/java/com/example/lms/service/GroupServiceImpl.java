@@ -2,6 +2,7 @@ package com.example.lms.service;
 
 import com.example.lms.dao.CourseRepository;
 import com.example.lms.dao.GroupRepository;
+import com.example.lms.dao.ScheduleRepository;
 import com.example.lms.dto.CourseRequestDto;
 import com.example.lms.dto.CourseResponseDto;
 import com.example.lms.dto.GroupRequestDto;
@@ -11,6 +12,7 @@ import com.example.lms.exceptions.ResourceNotFoundException;
 import com.example.lms.mappers.GroupMapper;
 import com.example.lms.models.Course;
 import com.example.lms.models.Group;
+import com.example.lms.models.Schedule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,6 +33,7 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
     private final CourseRepository courseRepository;
     private final GroupMapper groupMapper;
+    private final ScheduleRepository scheduleRepository;
 
     @Override
     @Transactional
@@ -106,6 +110,9 @@ public class GroupServiceImpl implements GroupService {
                         "Группа с ID " + externalId + " не найдена"
                 ));
         group.setDeleted(true);
+
+        Optional<Schedule> schedule = scheduleRepository.findByGroupId(group.getId());
+        schedule.ifPresent(value -> value.setDeleted(true));
     }
 
     @Override

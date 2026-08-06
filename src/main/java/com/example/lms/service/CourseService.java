@@ -19,5 +19,10 @@ public interface CourseService {
 
     void deleteCourse(UUID externalId);
 
-    Page<CourseResponseDto> findAllCourseByExternalId(int page, int size, String sortBy, String sortDir);
+    Page<CourseResponseDto> findAllCourseByExternalId(
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    );
 }

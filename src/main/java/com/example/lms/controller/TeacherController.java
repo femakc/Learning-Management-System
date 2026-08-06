@@ -50,7 +50,7 @@ public class TeacherController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping("/{externalId}")
+    @DeleteMapping("/delete-teacher/{externalId}")
     public void deleteTeacher(@PathVariable UUID externalId) {
         teacherService.deleteTeacherByExternalId(externalId);
     }

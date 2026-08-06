@@ -4,7 +4,6 @@ import com.example.lms.dao.CourseRepository;
 import com.example.lms.dao.TeacherRepository;
 import com.example.lms.dto.CourseRequestDto;
 import com.example.lms.dto.CourseResponseDto;
-import com.example.lms.dto.TeacherResponseDto;
 import com.example.lms.exceptions.ResourceAlreadyExistsException;
 import com.example.lms.exceptions.ResourceNotFoundException;
 import com.example.lms.mappers.CourseMapper;
@@ -15,12 +14,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,11 +31,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional(readOnly = true)
     public CourseResponseDto findByExternalId(UUID externalId) {
-        Course course = courseRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Курса с ID " + externalId + "не найдено"
-                ));
-        return courseMapper.toResponseDto(course);
+        return courseMapper.toResponseDto(getCourseOrThrow(externalId));
     }
 
     @Override
@@ -69,32 +61,18 @@ public class CourseServiceImpl implements CourseService {
         return courseMapper.toResponseDto(courseRepository.save(newCourse));
     }
 
-    private Teacher getTeacherOrThrow(UUID externalId) {
-        return teacherRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Учитель c id " + externalId + "не найден"
-                ));
-    }
-
     @Override
     @Transactional
     public CourseResponseDto updateCourse(UUID externalId, CourseRequestDto courseRequestDto) {
-        Course course = courseRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Курса с ID " + externalId + "не найдено"
-                ));
+        Course course = getCourseOrThrow(externalId);
         courseMapper.updateEntity(courseRequestDto, course);
         return courseMapper.toResponseDto(course);
     }
 
-
     @Override
     @Transactional
     public CourseResponseDto restoreCourse(UUID externalId) {
-        Course course = courseRepository.findAnyByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Курса с ID " + externalId + "не найдено"
-                ));
+        Course course = getCourseOrThrow(externalId);
         course.setDeleted(false);
         courseRepository.save(course);
         return courseMapper.toResponseDto(course);
@@ -103,10 +81,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public void deleteCourse(UUID externalId) {
-        Course course = courseRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Курса с ID " + externalId + "не найдено"
-                ));
+        Course course = getCourseOrThrow(externalId);
         course.setDeleted(true);
     }
 
@@ -123,5 +98,19 @@ public class CourseServiceImpl implements CourseService {
         PageRequest pageable = PageRequest.of(page, size, sort);
         Page<Course> coursePage = courseRepository.findAll(pageable);
         return coursePage.map(courseMapper::toResponseDto);
+    }
+
+    private Course getCourseOrThrow(UUID externalId) {
+        return courseRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Курса с ID " + externalId + "не найдено"
+                ));
+    }
+
+    private Teacher getTeacherOrThrow(UUID externalId) {
+        return teacherRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Учитель c id " + externalId + "не найден"
+                ));
     }
 }
