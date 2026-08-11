@@ -13,6 +13,7 @@ public interface StudentService {
     void deleteStudentByExternalId(UUID externalId);
     StudentResponseDto unitedStudentOfGroup(UUID externalIdStudent, UUID externalIdGroup);
     StudentResponseDto removeStudentOfGroup(UUID externalIdStudent, UUID externalIdGroup);
+    StudentResponseDto restoreStudent(UUID externalId);
 
     Page<StudentResponseDto> findAllStudentWithPagination(int page, int size, String sortBy, String sortDir);
 }

@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 8-add-not-nuul-tostart-and-end-time
+      author: max
+      changes:
+        - addNotNullConstraint:
+            tableName: schedules
+            columnName: start_time
+            columnDataType: timestamp with time zone
+
+        - addNotNullConstraint:
+            tableName: schedules
+            columnName: end_time
+            columnDataType: timestamp with time zone

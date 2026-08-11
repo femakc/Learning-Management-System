@@ -14,6 +14,14 @@ public interface ScheduleService {
     ScheduleResponseDto updateSchedule(UUID scheduleId, ScheduleRequestDto scheduleRequestDto);
     void deleteSchedule(UUID scheduleId);
     ScheduleResponseDto restoreSchedule(UUID externalId);
+    ScheduleResponseDto findScheduleByGroupId(UUID groupId);
+    Page<ScheduleResponseDto> findByTeacherId(
+            UUID teacherExternalId,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    );
 
     Page<ScheduleResponseDto> findAllSchedulesByExternalId(
             int page,

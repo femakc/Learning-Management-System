@@ -2,6 +2,7 @@ package com.example.lms.controller;
 
 import com.example.lms.dto.CourseRequestDto;
 import com.example.lms.dto.CourseResponseDto;
+import com.example.lms.dto.GroupRequestDto;
 import com.example.lms.models.Course;
 import com.example.lms.service.CourseService;
 import jakarta.validation.Valid;
@@ -71,5 +72,23 @@ public class CourseController {
     @DeleteMapping("/delete-course/{externalId}")
     void deleteCourse(@PathVariable UUID externalId) {
         courseService.deleteCourse(externalId);
+    }
+
+    @PatchMapping("/add-groups/{courseId}")
+    public ResponseEntity<CourseResponseDto> addGroupToCourse(
+            @PathVariable UUID courseId,
+            @RequestBody CourseRequestDto courseRequestDto
+    ) {
+        CourseResponseDto response = courseService.addGroupsToCourse(courseId, courseRequestDto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/remove-groups/{courseId}")
+    public ResponseEntity<CourseResponseDto> removeGroupForCourse(
+            @PathVariable UUID courseId,
+            @RequestBody CourseRequestDto courseRequestDto
+    ) {
+        CourseResponseDto response = courseService.removeGroupsFromCourse(courseId, courseRequestDto);
+        return ResponseEntity.ok(response);
     }
 }

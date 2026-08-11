@@ -2,6 +2,7 @@ package com.example.lms.controller;
 
 import com.example.lms.dto.TeacherRequestDto;
 import com.example.lms.dto.TeacherResponseDto;
+import com.example.lms.models.Teacher;
 import com.example.lms.service.TeacherService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,15 @@ public class TeacherController {
     @DeleteMapping("/delete-teacher/{externalId}")
     public void deleteTeacher(@PathVariable UUID externalId) {
         teacherService.deleteTeacherByExternalId(externalId);
+    }
+
+    @PatchMapping("/recovery-teacher/{externalId}")
+    public ResponseEntity<TeacherResponseDto> restoreTeacher(
+            @PathVariable UUID externalId
+    )
+    {
+        TeacherResponseDto teacher = teacherService.restoreTeacherByExternalId(externalId);
+        return new ResponseEntity<>(teacher, HttpStatus.OK);
     }
 
     @PutMapping("/update-teacher/{externalId}")

@@ -67,6 +67,19 @@ public class TeacherServiceImpl implements TeacherService {
     }
 
     @Override
+    @Transactional
+    public TeacherResponseDto restoreTeacherByExternalId (
+            UUID externalId
+    ) {
+        Teacher teacher = teacherRepository.findByExternalIdAny(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Курс с ID " + externalId + " не найден!"
+                ));
+        teacher.setDeleted(false);
+        return teacherMapper.toResponseDto(teacher);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<TeacherResponseDto> findAllTeachersWithPagination(int page, int size, String sortBy, String sortDir) {
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.DESC.name())

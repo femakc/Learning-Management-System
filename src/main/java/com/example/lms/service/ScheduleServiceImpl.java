@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -49,7 +50,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Course course = getCourseOrThrow(scheduleRequestDto);
         Group group = getGroupOrThrow(scheduleRequestDto);
 
-        //Проверка запланированного расписания. Требуется только создаем расписание!
+        //Проверка запланированного расписания. Требуется только когда создаем расписание!
         validateTimeOverLapping(
                 group,
                 scheduleRequestDto.startTime(),
@@ -72,7 +73,17 @@ public class ScheduleServiceImpl implements ScheduleService {
             UUID scheduleId,
             ScheduleRequestDto scheduleRequestDto) {
 
-        return null;
+        Schedule schedule = getScheduleOrThrow(scheduleId);
+
+        validateTimeInterval(scheduleRequestDto.startTime(), scheduleRequestDto.endTime());
+        validateTimeOverLapping(
+                schedule.getGroup(),
+                scheduleRequestDto.startTime(),
+                scheduleRequestDto.endTime()
+        );
+        schedule.setStartTime(scheduleRequestDto.startTime());
+        schedule.setEndTime(scheduleRequestDto.endTime());
+        return scheduleMapper.toResponseDto(schedule);
     }
 
     @Override
@@ -108,6 +119,36 @@ public class ScheduleServiceImpl implements ScheduleService {
                 : Sort.by(sortBy).ascending();
         PageRequest pageable = PageRequest.of(page, size, sort);
         Page<Schedule> coursePage = scheduleRepository.findAll(pageable);
+        return coursePage.map(scheduleMapper::toResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ScheduleResponseDto findScheduleByGroupId(UUID groupExternalId) {
+        Schedule schedule = scheduleRepository.findByGroupExternalId(groupExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "У группы с ID" + groupExternalId + " нет расписаний!"
+                ));
+        return scheduleMapper.toResponseDto(schedule);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ScheduleResponseDto> findByTeacherId(
+            UUID teacherExternalId,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    ) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.DESC.name())
+                ? Sort.by(sortBy).descending()
+                : Sort.by(sortBy).ascending();
+        PageRequest pageable = PageRequest.of(page, size, sort);
+        Page<Schedule> coursePage = scheduleRepository.findAllByCourseId(
+                teacherExternalId,
+                pageable
+        );
         return coursePage.map(scheduleMapper::toResponseDto);
     }
 

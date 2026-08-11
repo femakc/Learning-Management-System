@@ -21,4 +21,11 @@ public interface GroupRepository extends JpaRepository<Group, Long> {
 
     @Query(value = "SELECT * FROM groups WHERE name = :name", nativeQuery = true)
     Optional<Group> findByNameAny(@Param("name") String name);
+
+    @Query(value = "SELECT COUNT(*) > 0 " +
+            "FROM groups " +
+            "WHERE name = :name " +
+            "AND external_id != :externalId",
+            nativeQuery = true)
+    boolean existsByNameAny(@Param("name") String name, @Param("externalId") UUID externalId);
 }

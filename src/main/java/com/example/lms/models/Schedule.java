@@ -33,7 +33,7 @@ public class Schedule extends BaseEntity {
     private LocalDateTime startTime;
 
     @NotNull(message = "Время окончания занятий обязательно для заполнения")
-    @Column(name = "end_time")
+    @Column(name = "end_time", nullable = false)
     private LocalDateTime endTime;
 
 }

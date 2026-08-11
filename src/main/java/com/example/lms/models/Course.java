@@ -30,4 +30,14 @@ public class Course extends BaseEntity {
 
     @ManyToMany(mappedBy = "courses")
     private Set<Group> groups = new HashSet<>();
+
+    public void addGroups(Group group) {
+        groups.add(group);
+        group.getCourses().add(this);
+    }
+
+    public void removeGroups(Group group) {
+        groups.remove(group);
+        group.getCourses().remove(this);
+    }
 }

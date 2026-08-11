@@ -58,12 +58,23 @@ public class StudentServiceImpl implements StudentService {
     public StudentResponseDto updateStudentByExternalId(
             UUID externalId,
             StudentRequestDto studentRequestDto) {
+
         Student student = studentRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Студент с ID " + externalId + " не найден"
                 ))
                 ;
         studentMapper.updateEntityFromDto(studentRequestDto, student);
+        if (studentRequestDto.groupIds() != null) {
+            Set<Group> groups = groupRepository.findAllByExternalIdIn(studentRequestDto.groupIds());
+            if (groups.size() != studentRequestDto.groupIds().size()) {
+                throw new ResourceNotFoundException(
+                        "Одна или несколько групп не найдены"
+                );
+            }
+            student.setGroups(groups);
+        }
+
         return studentMapper.toResponseDto(student);
     }
 
@@ -77,6 +88,18 @@ public class StudentServiceImpl implements StudentService {
                 ;
         student.setDeleted(true);
         studentRepository.save(student);
+    }
+
+    @Override
+    @Transactional
+    public StudentResponseDto restoreStudent(UUID externalId) {
+        Student student = studentRepository.findByExternalIdAny(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Студента с ID " + externalId + " не найдено!"
+                ));
+        student.setDeleted(false);
+
+        return studentMapper.toResponseDto(student);
     }
 
     @Override

@@ -56,7 +56,16 @@ public class GroupController {
         groupService.deleteGroupByExternalId(externalId);
     }
 
-    @DeleteMapping("/{groupId}/course/{courseId}")
+    @PatchMapping("/add-group/{groupId}/to-course/{courseId}")
+    public ResponseEntity<GroupResponseDto> addGroupToCourse(
+            @PathVariable UUID groupId,
+            @PathVariable UUID courseId
+    ) {
+        GroupResponseDto response = groupService.addGroupFromCourse(groupId, courseId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/remove-group/{groupId}/from-course/{courseId}")
     public void deleteGroupCourse(@PathVariable UUID groupId, @PathVariable UUID courseId){
         groupService.removeCourseFromGroupByExternalId(groupId, courseId);
     }
@@ -75,6 +84,24 @@ public class GroupController {
             @PathVariable UUID externalId
     ) {
         GroupResponseDto response = groupService.restoreGroupByExternalId(externalId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/add-students-to-group/{externalId}")
+    public ResponseEntity<GroupResponseDto> addStudentsToGroup (
+            @RequestBody GroupRequestDto groupRequestDto,
+            @PathVariable UUID externalId
+    ){
+        GroupResponseDto response = groupService.addStudentsToGroup(externalId, groupRequestDto);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/delete-students/{externalId}")
+    public ResponseEntity<GroupResponseDto> deleteStudentsFromGroup (
+            @PathVariable UUID externalId,
+            @RequestBody GroupRequestDto groupRequestDto
+    ) {
+        GroupResponseDto response = groupService.deleteStudentFromGroup(externalId, groupRequestDto);
         return ResponseEntity.ok(response);
     }
 }

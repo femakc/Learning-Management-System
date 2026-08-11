@@ -3,6 +3,7 @@ package com.example.lms.service;
 import com.example.lms.dao.CourseRepository;
 import com.example.lms.dao.GroupRepository;
 import com.example.lms.dao.ScheduleRepository;
+import com.example.lms.dao.StudentRepository;
 import com.example.lms.dto.CourseRequestDto;
 import com.example.lms.dto.CourseResponseDto;
 import com.example.lms.dto.GroupRequestDto;
@@ -13,6 +14,7 @@ import com.example.lms.mappers.GroupMapper;
 import com.example.lms.models.Course;
 import com.example.lms.models.Group;
 import com.example.lms.models.Schedule;
+import com.example.lms.models.Student;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
@@ -31,6 +33,7 @@ import java.util.UUID;
 @Primary
 public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupRepository;
+    private final StudentRepository studentRepository;
     private final CourseRepository courseRepository;
     private final GroupMapper groupMapper;
     private final ScheduleRepository scheduleRepository;
@@ -43,45 +46,16 @@ public class GroupServiceImpl implements GroupService {
                 .orElseGet(() -> createNewGroup(groupRequestDto));
     }
 
-    private GroupResponseDto processExistingGroup(Group existingGroup, GroupRequestDto groupRequestDto) {
-        if (!existingGroup.getDeleted())
-            throw new ResourceAlreadyExistsException(
-                    "Группа с именем " + existingGroup.getName() + " существует"
-            );
-        existingGroup.setDeleted(false);
-
-        bindCoursesIfPresent(existingGroup, groupRequestDto.courseIds());
-
-        return groupMapper.toResponseDto(existingGroup);
-    }
-
-    private GroupResponseDto createNewGroup(GroupRequestDto groupRequestDto) {
-        Group savedGroup = groupRepository.save(groupMapper.toEntity(groupRequestDto));
-        return groupMapper.toResponseDto(savedGroup);
-    }
-
-    private void bindCoursesIfPresent(Group group, Set<UUID> courseIds) {
-
-        if (courseIds != null && !courseIds.isEmpty()) {
-            Set<Course> foundCourses = courseRepository.findByExternalIdIn(courseIds);
-
-            if (courseIds.size() != foundCourses.size()) {
-                throw new ResourceNotFoundException(
-                        "Один или несколько переданных курсов не найдены"
-                );
-            }
-            group.setCourses(foundCourses);
-        }
-    }
-
     @Override
     @Transactional
     public GroupResponseDto updateGroupByExternalId(UUID externalId, GroupRequestDto groupRequestDto) {
-        Group group = groupRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Группа с ID " + externalId + " не найдена"
-                ));
-        groupMapper.updateEntityFromDto(groupRequestDto, group);
+        if (groupRepository.existsByNameAny(groupRequestDto.name(), externalId)) {
+            throw new ResourceAlreadyExistsException(
+                    "Группа с именем " + groupRequestDto.name() + " существует!"
+            );
+        }
+
+        Group group = getGroupByExternalId(externalId);
 
         if (groupRequestDto.courseIds() != null){
             group.getCourses().clear();
@@ -89,26 +63,29 @@ public class GroupServiceImpl implements GroupService {
             bindCoursesIfPresent(group, groupRequestDto.courseIds());
         }
 
+        if (groupRequestDto.studentIds() != null){
+            group.getStudents().forEach(student -> student.getGroups().remove(group));
+            group.getStudents().clear();
+
+            bindStudentsIfPresent(group, groupRequestDto.studentIds());
+        }
+
+        groupMapper.updateEntityFromDto(groupRequestDto, group);
+
         return groupMapper.toResponseDto(group);
     }
 
     @Override
     @Transactional(readOnly = true)
     public GroupResponseDto findGroupByExternalId(UUID externalId) {
-        Group group = groupRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Группа с ID " + externalId + " не найдена"
-                ));
+        Group group = getGroupByExternalId(externalId);
         return groupMapper.toResponseDto(group);
     }
 
     @Override
     @Transactional
     public void deleteGroupByExternalId(UUID externalId) {
-        Group group = groupRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Группа с ID " + externalId + " не найдена"
-                ));
+        Group group = getGroupByExternalId(externalId);
         group.setDeleted(true);
 
         Optional<Schedule> schedule = scheduleRepository.findByGroupId(group.getId());
@@ -116,11 +93,10 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public GroupResponseDto restoreGroupByExternalId(UUID externalId) {
-        Group group = groupRepository.findAnyByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Группы с ID " + externalId + "не найдено"
-                ));
+        Group group = getGroupByExternalId(externalId);
+        group.setDeleted(false);
         return groupMapper.toResponseDto(group);
     }
 
@@ -142,14 +118,9 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional
     public GroupResponseDto removeCourseFromGroupByExternalId(UUID groupId, UUID courseId) {
-        Group group = groupRepository.findByExternalId(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Группы с ID " + groupId + " не найдено"
-                ));
-        Course course = courseRepository.findByExternalId(courseId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Курса с ID " + courseId + " не найдено"
-                ));
+        Group group = getGroupByExternalId(groupId);
+        Course course = getCourseByExternalId(courseId);
+
         if (!group.getCourses().contains(course)) {
             throw new ResourceNotFoundException(
                     "Указанный курс не привязан к группе"
@@ -160,5 +131,103 @@ public class GroupServiceImpl implements GroupService {
         course.getGroups().remove(group);
 
         return groupMapper.toResponseDto(group);
+    }
+
+    @Override
+    @Transactional
+    public GroupResponseDto addStudentsToGroup(UUID externalID, GroupRequestDto groupRequestDto) {
+        Group group = getGroupByExternalId(externalID);
+        bindStudentsIfPresent(group, groupRequestDto.studentIds());
+        return groupMapper.toResponseDto(group);
+    }
+
+    @Override
+    @Transactional
+    public GroupResponseDto deleteStudentFromGroup(UUID externalId, GroupRequestDto groupRequestDto) {
+        Group group = getGroupByExternalId(externalId);
+        removeStudentsFromGroup(group, groupRequestDto.studentIds());
+        return groupMapper.toResponseDto(group);
+    }
+
+    @Override
+    @Transactional
+    public GroupResponseDto addGroupFromCourse(UUID groupId, UUID courseId) {
+        Group group = getGroupByExternalId(groupId);
+        Course course = getCourseByExternalId(courseId);
+        group.getCourses().add(course);
+        course.getGroups().add(group);
+        return groupMapper.toResponseDto(group);
+    }
+
+    private void removeStudentsFromGroup(Group group, Set<UUID> studentIds) {
+        if (studentIds != null && !studentIds.isEmpty()) {
+            Set<Student> existingStudents = studentRepository.findByExternalIdIn(studentIds);
+
+            if (studentIds.size() != existingStudents.size()) {
+                throw new ResourceNotFoundException(
+                        "Один или несколько переданных студентов не найдены!"
+                );
+            }
+            existingStudents.forEach(group::removeStudents);
+        }
+    }
+
+    private GroupResponseDto processExistingGroup(Group existingGroup, GroupRequestDto groupRequestDto) {
+        if (!existingGroup.getDeleted())
+            throw new ResourceAlreadyExistsException(
+                    "Группа с именем " + existingGroup.getName() + " существует"
+            );
+        existingGroup.setDeleted(false);
+
+        bindCoursesIfPresent(existingGroup, groupRequestDto.courseIds());
+
+        return groupMapper.toResponseDto(existingGroup);
+    }
+
+    private GroupResponseDto createNewGroup(GroupRequestDto groupRequestDto) {
+        Group savedGroup = groupRepository.save(groupMapper.toEntity(groupRequestDto));
+        return groupMapper.toResponseDto(savedGroup);
+    }
+
+    private void bindStudentsIfPresent(Group group, Set<UUID> studentIds) {
+        if (studentIds != null && !studentIds.isEmpty()) {
+            Set<Student> existingStudents = studentRepository.findByExternalIdIn(studentIds);
+
+            if (studentIds.size() != existingStudents.size()) {
+                throw new ResourceNotFoundException(
+                        "Один или несколько переданных студентов не найдены!"
+                );
+            }
+
+            existingStudents.forEach(group::addStudents);
+        }
+    }
+
+    private void bindCoursesIfPresent(Group group, Set<UUID> courseIds) {
+
+        if (courseIds != null && !courseIds.isEmpty()) {
+            Set<Course> foundCourses = courseRepository.findByExternalIdIn(courseIds);
+
+            if (courseIds.size() != foundCourses.size()) {
+                throw new ResourceNotFoundException(
+                        "Один или несколько переданных курсов не найдены!"
+                );
+            }
+            group.setCourses(foundCourses);
+        }
+    }
+
+    private Course getCourseByExternalId(UUID externalId) {
+        return courseRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Курса с ID " + externalId + " не найдено"
+                ));
+    }
+
+    private Group getGroupByExternalId(UUID externalId) {
+        return groupRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Группы с ID " + externalId + " не найдено!"
+                ));
     }
 }

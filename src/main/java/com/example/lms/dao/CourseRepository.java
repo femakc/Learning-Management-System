@@ -16,9 +16,15 @@ public interface CourseRepository extends JpaRepository<Course, UUID> {
     @Query(value = "SELECT * FROM courses WHERE external_id = :externalId", nativeQuery = true)
     Optional<Course> findAnyByExternalId(@Param("externalId") UUID externalId);
 
-    @Query(value = "SELECT COUNT(*) > 0 FROM courses WHERE name = :name", nativeQuery = true)
-    boolean existsByNameAny(@Param("name") String name);
+    @Query(value = "SELECT COUNT(*) > 0 " +
+            "FROM courses " +
+            "WHERE name = :name " +
+            "AND external_id != :externalId",
+            nativeQuery = true)
+    boolean existsByNameAny(@Param("name") String name,  @Param("externalId") UUID externalId);
 
     @Query(value = "SELECT * FROM courses WHERE name = :name", nativeQuery = true)
     Optional<Course> findByNameAny(@Param("name") String name);
+
+
 }

@@ -31,4 +31,14 @@ public class Group extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "course_id")
     )
     private Set<Course> courses = new HashSet<>();
+
+    public void addStudents(Student student) {
+        students.add(student);
+        student.getGroups().add(this);
+    }
+
+    public void removeStudents(Student student) {
+        students.remove(student);
+        student.getGroups().remove(this);
+    }
 }

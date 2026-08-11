@@ -16,6 +16,8 @@ public interface CourseService {
     CourseResponseDto saveCourse(CourseRequestDto courseDto);
     CourseResponseDto updateCourse(UUID externalId, CourseRequestDto courseRequestDto);
     CourseResponseDto restoreCourse(UUID externalId);
+    CourseResponseDto addGroupsToCourse(UUID courseId, CourseRequestDto courseRequestDto);
+    CourseResponseDto removeGroupsFromCourse(UUID courseId, CourseRequestDto courseRequestDto);
 
     void deleteCourse(UUID externalId);
 

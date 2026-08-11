@@ -13,6 +13,9 @@ public interface GroupService {
     void deleteGroupByExternalId(UUID externalId);
     GroupResponseDto restoreGroupByExternalId(UUID externalId);
     GroupResponseDto removeCourseFromGroupByExternalId(UUID groupId, UUID courseId);
+    GroupResponseDto addStudentsToGroup(UUID externalID, GroupRequestDto groupRequestDto);
+    GroupResponseDto deleteStudentFromGroup(UUID externalId, GroupRequestDto groupRequestDto);
+    GroupResponseDto addGroupFromCourse(UUID groupId, UUID courseId);
 
     Page<GroupResponseDto> findAllGroupsWithPagination(int page, int size, String sortBy, String sortDir);
 }

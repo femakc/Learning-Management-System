@@ -11,6 +11,7 @@ public interface TeacherService {
     TeacherResponseDto getTeacherByExternalId(UUID externalId);
     TeacherResponseDto updateTeacherByExternalId(UUID externalId,  TeacherRequestDto teacherRequestDto);
     void deleteTeacherByExternalId(UUID externalId);
+    TeacherResponseDto restoreTeacherByExternalId(UUID externalId);
 
     Page<TeacherResponseDto> findAllTeachersWithPagination(int page, int size, String sortBy, String sortDir);
 }

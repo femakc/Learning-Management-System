@@ -54,7 +54,7 @@ public class StudentController {
     @PutMapping("/update-student/{externalId}")
     public ResponseEntity<StudentResponseDto> updateStudent (
             @Valid
-            @RequestParam UUID externalId,
+            @PathVariable UUID externalId,
             @RequestBody StudentRequestDto studentRequestDto) {
         StudentResponseDto response = studentService.updateStudentByExternalId(externalId, studentRequestDto);
         return ResponseEntity.ok(response);
@@ -65,13 +65,22 @@ public class StudentController {
         studentService.deleteStudentByExternalId(externalId);
     }
 
-    @PostMapping("/{studentId}/group/{groupId}")
+    @PatchMapping("/recovery-student/{externalId}")
+    public ResponseEntity<StudentResponseDto> restoreStudent(
+            @PathVariable UUID externalId
+    )
+    {
+        StudentResponseDto student = studentService.restoreStudent(externalId);
+        return ResponseEntity.ok(student);
+    }
+
+    @PatchMapping("/{studentId}/group/{groupId}")
     public ResponseEntity<StudentResponseDto> addGroupStudent(
            @PathVariable UUID studentId,
            @PathVariable UUID groupId
     ) {
         StudentResponseDto response = studentService.unitedStudentOfGroup(studentId, groupId);
-        return ResponseEntity.ok(response); //TODO проверить работу
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{studentId}/group/{groupId}")
