@@ -50,4 +50,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
             "JOIN c.teacher t " +
             "WHERE t.externalId = :teacherExternalId")
     Page<Schedule> findAllByCourseId(@Param("teacherExternalId") UUID teacherExternalId,  Pageable pageable);
+
+    List<Schedule> findByStartTimeBefore(LocalDateTime lastDateTime);
 }

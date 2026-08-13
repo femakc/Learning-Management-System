@@ -9,6 +9,7 @@ import com.example.lms.exceptions.ResourceAlreadyExistsException;
 import com.example.lms.exceptions.ResourceIllegalArgumentException;
 import com.example.lms.exceptions.ResourceNotFoundException;
 import com.example.lms.mappers.ScheduleMapper;
+import com.example.lms.models.BaseEntity;
 import com.example.lms.models.Group;
 import com.example.lms.models.Course;
 import com.example.lms.models.Schedule;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -150,6 +152,13 @@ public class ScheduleServiceImpl implements ScheduleService {
                 pageable
         );
         return coursePage.map(scheduleMapper::toResponseDto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UUID> getPastScheduleIds(LocalDateTime pastDateTime) {
+        List<Schedule> schedules = scheduleRepository.findByStartTimeBefore(pastDateTime);
+        return schedules.stream().map(Schedule::getExternalId).collect(Collectors.toList());
     }
 
     private Schedule getScheduleOrThrow(UUID externalId) {
