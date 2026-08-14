@@ -39,7 +39,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(), // Статус 404
+                HttpStatus.NOT_FOUND.value(),
                 "Resource Not Found",
                 ex.getMessage()
         );
@@ -50,21 +50,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceAlreadyExists(ResourceAlreadyExistsException ex) {
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(), // Статус 409
+                HttpStatus.CONFLICT.value(),
                 "Resource Already Exists",
                 ex.getMessage()
         );
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(ResourceIllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(ResourceIllegalArgumentException ex) {
         ErrorResponse error = new ErrorResponse(
                 LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(), // Статус 409
-                "Resource Already Exists",
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request",
                 ex.getMessage()
         );
-        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 }

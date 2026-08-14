@@ -1,0 +1,20 @@
+# Игнорируем всё, что не нужно в образе
+.git
+.gitignore
+README.md
+*.md
+*.log
+*.tmp
+.idea/
+.vscode/
+target/
+.classpath
+.project
+.settings/
+Dockerfile
+.dockerignore
+docker-compose.yml
+.env
+*.iml
+node_modules/
+npm-debug.log
