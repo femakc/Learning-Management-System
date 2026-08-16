@@ -45,7 +45,7 @@ public class ScheduleController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/delete-schedule/{externalId}")
+    @DeleteMapping("/{externalId}")
     public void deleteScheduleByExternalId (@PathVariable UUID externalId) {
         scheduleService.deleteSchedule(externalId);
     }

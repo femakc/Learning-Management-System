@@ -65,7 +65,7 @@ public class StudentController {
         studentService.deleteStudentByExternalId(externalId);
     }
 
-    @PatchMapping("/recovery-student/{externalId}")
+    @PatchMapping("/{externalId}")
     public ResponseEntity<StudentResponseDto> restoreStudent(
             @PathVariable UUID externalId
     )

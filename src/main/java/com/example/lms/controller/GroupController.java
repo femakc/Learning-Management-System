@@ -51,7 +51,7 @@ public class GroupController {
         return ResponseEntity.ok(group);
     }
 
-    @DeleteMapping("/delete-group/{externalId}")
+    @DeleteMapping("/{externalId}")
     public void deleteGroup(@PathVariable UUID externalId){
         groupService.deleteGroupByExternalId(externalId);
     }

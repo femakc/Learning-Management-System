@@ -69,7 +69,7 @@ public class CourseController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/delete-course/{externalId}")
+    @DeleteMapping("/{externalId}")
     void deleteCourse(@PathVariable UUID externalId) {
         courseService.deleteCourse(externalId);
     }
