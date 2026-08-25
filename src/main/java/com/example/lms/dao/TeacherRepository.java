@@ -1,6 +1,5 @@
 package com.example.lms.dao;
 
-import com.example.lms.models.Course;
 import com.example.lms.models.Teacher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
